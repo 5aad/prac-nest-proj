@@ -1,10 +1,52 @@
-import { Entity, Column, UpdateDateColumn, ObjectIdColumn, ObjectId, CreateDateColumn } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid'; 
+import {
+  Entity,
+  Column,
+  UpdateDateColumn,
+  ObjectIdColumn,
+  ObjectId,
+  CreateDateColumn,
+} from 'typeorm';
 
 export enum Role {
   User = 'user',
   Vendor = 'vendor',
   Admin = 'admin',
+}
+
+// Embedded Address object
+export class Address {
+  @Column({ nullable: true })
+  street?: string;
+
+  @Column({ nullable: true })
+  city?: string;
+
+  @Column({ nullable: true })
+  postalCode?: string;
+
+  @Column({ nullable: true })
+  country?: string;
+}
+
+export class Verification {
+  @Column({ nullable: true })
+  token?: string;
+  @Column({ nullable: true, type: 'timestamptz' })
+  expires?: Date;
+}
+
+export class GoogleAuth {
+  @Column({ nullable: true })
+  googleId?: string;
+  @Column({ nullable: true })
+  accessToken?: string;
+}
+
+export class StripeIdentity {
+  @Column({ nullable: true })
+  stripeIdentityId?: string;
+  @Column({ nullable: true })
+  stripeIdentityStatus?: string;
 }
 
 @Entity()
@@ -19,10 +61,10 @@ export class Users {
   password: string;
 
   @Column()
-  first_name: string;
+  firstName: string;
 
   @Column()
-  last_name: string;
+  lastName: string;
 
   @Column({
     type: 'enum',
@@ -32,8 +74,36 @@ export class Users {
   role: Role;
 
   @CreateDateColumn({ type: 'timestamptz' })
-  created_at: Date;
+  createdAt: Date;
 
   @UpdateDateColumn({ type: 'timestamptz' })
-  updated_at: Date;
+  updatedAt: Date;
+
+  @Column({ default: false })
+  isEmailVerified: boolean;
+
+  // Optional profile details
+  @Column({ type: 'date', nullable: true })
+  dateOfBirth?: Date;
+
+  @Column({ nullable: true })
+  gender?: string;
+
+  @Column({ nullable: true })
+  phone?: string;
+
+  @Column((type) => Address)
+  address?: Address;
+
+  @Column((type) => Verification)
+  emailVerification?: Verification;
+
+  @Column((type) => Verification)
+  passwordResetVerification?: Verification;
+
+  @Column((type) => GoogleAuth)
+  googleAuth?: GoogleAuth;
+
+  @Column((type) => StripeIdentity)
+  stripeIdentity?: StripeIdentity;
 }
