@@ -53,24 +53,6 @@ export class UsersService {
 
     return this.userRepository.save(newUser);
   }
-  async findByIdMe(id: string): Promise<Users> {
-    const objectId = new ObjectId(id);
-    const user = await this.userRepository.findOne({ where: { id: objectId } });
-    if (!user) {
-      throw new NotFoundException(`User with id ${id} not found`);
-    }
-    return user;
-  }
-
-  // Update a user by id using UpdateUserDto
-  async updateMe(id: string, updateUserDto: UpdateUserDto): Promise<Users> {
-    const user = await this.findById(id);
-    if (!user) {
-      throw new NotFoundException(`User with id ${id} not found`);
-    }
-    const updatedUser = Object.assign(user, updateUserDto);
-    return await this.userRepository.save(updatedUser);
-  }
 
   async findAll(): Promise<Users[]> {
     const users = await this.userRepository.find();
