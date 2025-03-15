@@ -41,6 +41,11 @@ export class UpdateUserDto {
   role?: string;
 
   // Optional profile details
+
+  @IsOptional()
+  @IsString()
+  profileImage?: string;
+
   @IsOptional()
   @IsDateString()
   dateOfBirth?: string;

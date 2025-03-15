@@ -83,6 +83,9 @@ export class Users {
   isEmailVerified: boolean;
 
   // Optional profile details
+  @Column({ nullable: true })
+  profileImage?: string;
+  
   @Column({ type: 'date', nullable: true })
   dateOfBirth?: Date;
 

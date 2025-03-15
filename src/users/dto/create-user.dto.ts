@@ -51,6 +51,10 @@ import {
   
     // Optional profile details
     @IsOptional()
+    @IsString()
+    profileImage?: string;
+    
+    @IsOptional()
     @IsDateString()
     dateOfBirth?: string;
   
