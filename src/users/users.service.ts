@@ -1,4 +1,5 @@
 import {
+  Inject,
   Injectable,
   BadRequestException,
   NotFoundException,
@@ -8,6 +9,7 @@ import { Role, Users } from './entities/users.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { StorageService } from 'src/common/storage/storage.interface';
 import * as bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { ObjectId } from 'mongodb';
@@ -16,6 +18,7 @@ export class UsersService {
   constructor(
     @InjectRepository(Users)
     private userRepository: Repository<Users>,
+    @Inject('STORAGE_SERVICE') private readonly storageService: StorageService,
   ) {}
 
   async register(createUserDto: CreateUserDto): Promise<Users> {
@@ -88,5 +91,16 @@ export class UsersService {
       throw new NotFoundException(`User with id ${id} not found`);
     }
     return { deleted: true };
+  }
+
+  async uploadUserAvatar(file: Express.Multer.File, id: string) {
+    const url = await this.storageService.uploadFile(file, `avatars/${id}`);
+    const user = await this.findById(id);
+    if (!user) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+    user.profileImage = url;
+
+    return await this.userRepository.save(user);
   }
 }

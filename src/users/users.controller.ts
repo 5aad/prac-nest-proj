@@ -21,6 +21,7 @@ import { Role } from './entities/users.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
+import { Base64UploadDto } from './dto/base64-upload.dto';
 @Controller('users')
 export class UsersController {
   constructor(private userService: UsersService) {}
@@ -76,6 +77,34 @@ export class UsersController {
         {
           status: HttpStatus.BAD_REQUEST,
           message: error.message || 'Error updating profile data',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @Post('avatar')
+  async uploadAvatarBase64(
+    @Request() req,
+    @Body() base64UploadDto: Base64UploadDto,
+  ) {
+    try {
+      // Decode base64 to Buffer
+      const fileBuffer = Buffer.from(base64UploadDto.file, 'base64');
+      const file = {
+        buffer: fileBuffer,
+        originalname:
+          base64UploadDto.originalname || `upload-${Date.now()}.png`,
+        mimetype: base64UploadDto.mimetype || 'image/png',
+      } as Express.Multer.File; // Cast to Express.Multer.File type
+
+      const avatarUrl = await this.userService.uploadUserAvatar(file, req.user.id);
+      return { avatarUrl };
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          message: error.message,
         },
         HttpStatus.BAD_REQUEST,
       );
