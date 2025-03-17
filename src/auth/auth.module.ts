@@ -8,6 +8,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Users } from '../users/entities/users.entity';
 import { RolesGuard } from '../common/guards/roles.guard';
+import { GoogleStrategy } from './google.strategy';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { RolesGuard } from '../common/guards/roles.guard';
     }),
     TypeOrmModule.forFeature([Users]), // Register the User entity
   ],
-  providers: [AuthService, JwtStrategy, RolesGuard],
+  providers: [AuthService, JwtStrategy, RolesGuard, GoogleStrategy],
   controllers: [AuthController],
 })
 export class AuthModule {}
