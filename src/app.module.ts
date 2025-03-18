@@ -10,6 +10,7 @@ import { Keyv } from 'keyv';
 import { CacheableMemory } from 'cacheable';
 import { FirebaseStorageService } from './common/storage/firebase-storage.service';
 import { DigitalOceanStorageService } from './common/storage/digital-ocean-storage.service';
+import { PostsModule } from './posts/posts.module';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -32,6 +33,7 @@ const useFirebase = process.env.STORAGE_PROVIDER === 'firebase';
     AuthModule,
     ConfigModule,
     UsersModule,
+    PostsModule,
   ],
   providers: [
     {
