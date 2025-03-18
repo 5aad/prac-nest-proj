@@ -21,6 +21,14 @@ export class UsersService {
     @Inject('STORAGE_SERVICE') private readonly storageService: StorageService,
   ) {}
 
+  async findByEmail(email: string): Promise<Users> {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException(`User with email ${email} not found`);
+    }
+    return user;
+  }
+
   async register(createUserDto: CreateUserDto): Promise<Users> {
     const { email, firstName, lastName, phone, address, gender, dateOfBirth } =
       createUserDto;
