@@ -13,6 +13,7 @@ import {
   ValidationPipe,
   UsePipes,
   Request,
+  UseInterceptors 
 } from '@nestjs/common';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -22,6 +23,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 import { Base64UploadDto } from './dto/base64-upload.dto';
+import { CacheTTL } from '@nestjs/cache-manager';
+import { UserCacheInterceptor } from 'src/common/interceptors/user-cache.interceptor';
 @Controller('users')
 export class UsersController {
   constructor(private userService: UsersService) {}
@@ -47,6 +50,8 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
+  @UseInterceptors(UserCacheInterceptor)
+  @CacheTTL(120)
   async getProfile(@Request() req) {
     try {
       const user = await this.userService.findById(req.user.id);
