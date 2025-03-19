@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from './config/config.module';
-import { typeOrmConfig } from './typeorm.config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from './users/users.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { createKeyv } from '@keyv/redis';
@@ -29,7 +28,12 @@ const useFirebase = process.env.STORAGE_PROVIDER === 'firebase';
         };
       },
     }),
-    TypeOrmModule.forRoot(typeOrmConfig),
+    MongooseModule.forRoot(
+      process.env.MONGODB_URL || 'mongodb://localhost:27017/nestjs',
+      {
+        dbName: process.env.MONGODB_DB_NAME || 'nestjs',
+      },
+    ),
     AuthModule,
     ConfigModule,
     UsersModule,

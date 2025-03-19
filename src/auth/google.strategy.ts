@@ -1,7 +1,7 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
-import { Role } from 'src/users/entities/users.entity';
+import { Role } from 'src/users/schemas/user.schema';
 import { UsersService } from 'src/users/users.service';
 import { v4 as uuidv4 } from 'uuid';
 @Injectable()

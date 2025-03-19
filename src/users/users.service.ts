@@ -4,35 +4,33 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Role, Users } from './entities/users.entity';
-import { Repository } from 'typeorm';
+import { InjectModel } from '@nestjs/mongoose';
+import { Role, IUser } from './schemas/user.schema';
+import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { StorageService } from 'src/common/storage/storage.interface';
 import * as bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
-import { ObjectId } from 'mongodb';
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(Users)
-    private userRepository: Repository<Users>,
+    @InjectModel('User') private userModel: Model<IUser>,
     @Inject('STORAGE_SERVICE') private readonly storageService: StorageService,
   ) {}
 
-  async findByEmail(email: string): Promise<Users> {
-    const user = await this.userRepository.findOne({ where: { email } });
+  async findByEmail(email: string): Promise<IUser> {
+    const user = await this.userModel.findOne({ where: { email } });
     if (!user) {
       throw new NotFoundException(`User with email ${email} not found`);
     }
     return user;
   }
 
-  async register(createUserDto: CreateUserDto): Promise<Users> {
+  async register(createUserDto: CreateUserDto): Promise<IUser> {
     const { email, firstName, lastName, phone, address, gender, dateOfBirth } =
       createUserDto;
-    const existingUser = await this.userRepository.findOne({
+    const existingUser = await this.userModel.findOne({
       where: { email: createUserDto.email },
     });
     if (existingUser) {
@@ -45,7 +43,7 @@ export class UsersService {
     const verificationExpiry = new Date();
     verificationExpiry.setHours(verificationExpiry.getHours() + 24);
 
-    const newUser = this.userRepository.create({
+    const newUser = this.userModel.create({
       email,
       firstName,
       lastName,
@@ -62,40 +60,43 @@ export class UsersService {
       role: Role.User,
     });
 
-    return this.userRepository.save(newUser);
+    return newUser;
   }
 
-  async findAll(): Promise<Users[]> {
-    const users = await this.userRepository.find();
+  async findAll(): Promise<IUser[]> {
+    const users = await this.userModel.find();
     if (!users || users.length === 0) {
       throw new NotFoundException('No users found');
     }
     return users;
   }
 
-  async findById(id: string): Promise<Users> {
-    const objectId = new ObjectId(id);
-    const user = await this.userRepository.findOne({ where: { id: objectId } });
+  async findById(id: string): Promise<IUser> {
+    const user = await this.userModel.findById(id);
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
     return user;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<Users> {
-    const objectId = new ObjectId(id);
-    const user = await this.userRepository.findOne({ where: { id: objectId } });
-    if (!user) {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<IUser> {
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      id, // Find by ObjectId
+      updateUserDto, // Data to update
+      { new: true, runValidators: true } // Return updated user and run validations
+    );
+
+    if (!updatedUser) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
-    const updatedUser = Object.assign(user, updateUserDto);
 
-    return await this.userRepository.save(updatedUser);
+    return updatedUser;
   }
 
   async delete(id: string): Promise<{ deleted: boolean }> {
-    const result = await this.userRepository.delete(id);
-    if (result.affected === 0) {
+    const result = await this.userModel.findByIdAndDelete(id);
+
+    if (!result) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
     return { deleted: true };
@@ -103,12 +104,15 @@ export class UsersService {
 
   async uploadUserAvatar(file: Express.Multer.File, id: string) {
     const url = await this.storageService.uploadFile(file, `avatars/${id}`);
-    const user = await this.findById(id);
-    if (!user) {
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      id,
+      { profileImage: url },
+      { new: true }
+    );
+    if (!updatedUser) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
-    user.profileImage = url;
 
-    return await this.userRepository.save(user);
+    return updatedUser;
   }
 }
