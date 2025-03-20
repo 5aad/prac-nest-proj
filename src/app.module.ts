@@ -11,6 +11,7 @@ import { FirebaseStorageService } from './common/storage/firebase-storage.servic
 import { DigitalOceanStorageService } from './common/storage/digital-ocean-storage.service';
 import { PostsModule } from './posts/posts.module';
 import * as dotenv from 'dotenv';
+import { ReviewsModule } from './reviews/reviews.module';
 
 dotenv.config();
 const useFirebase = process.env.STORAGE_PROVIDER === 'firebase';
@@ -38,6 +39,7 @@ const useFirebase = process.env.STORAGE_PROVIDER === 'firebase';
     ConfigModule,
     UsersModule,
     PostsModule,
+    ReviewsModule
   ],
   providers: [
     {
