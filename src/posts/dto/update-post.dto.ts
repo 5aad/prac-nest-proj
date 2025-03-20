@@ -1,37 +1,37 @@
-// src/posts/dto/create-post.dto.ts
+// src/posts/dto/update-post.dto.ts
 import {
     IsString,
-    IsNotEmpty,
-    IsNumber,
     IsOptional,
+    IsNumber,
     IsArray,
     ValidateNested,
     IsEnum,
     IsMongoId,
     ArrayMinSize,
-    IsObject,
     IsDateString,
   } from 'class-validator';
   import { Type } from 'class-transformer';
   
   class RentDto {
+    @IsOptional()
     @IsNumber()
-    cold: number;
-  
-    @IsNumber()
-    warm: number;
-  
-    @IsNumber()
-    utility: number;
+    cold?: number;
   
     @IsOptional()
     @IsNumber()
-    extra?: number = 0;
+    warm?: number;
   
-    // total will be calculated by the service so we can mark it as optional.
     @IsOptional()
     @IsNumber()
-    total?: number = 0;
+    utility?: number;
+  
+    @IsOptional()
+    @IsNumber()
+    extra?: number;
+  
+    @IsOptional()
+    @IsNumber()
+    total?: number;
   }
   
   class AddressDto {
@@ -57,41 +57,45 @@ import {
   }
   
   class AvailabilityDto {
+    @IsOptional()
     @IsDateString()
-    start: Date;
+    start?: Date;
   
+    @IsOptional()
     @IsDateString()
-    end: Date;
+    end?: Date;
   }
   
   class LocationDto {
+    @IsOptional()
     @IsString()
-    @IsNotEmpty()
     @IsEnum(['Point'])
-    type: 'Point';
+    type?: 'Point';
   
+    @IsOptional()
     @IsArray()
     @ArrayMinSize(2)
     @IsNumber({}, { each: true })
-    coordinates: [number, number];
+    coordinates?: [number, number];
   }
   
-  export class CreatePostDto {
+  export class UpdatePostDto {
+    @IsOptional()
     @IsString()
-    @IsNotEmpty()
-    title: string;
+    title?: string;
   
+    @IsOptional()
     @IsString()
-    @IsNotEmpty()
-    description: string;
+    description?: string;
   
+    @IsOptional()
     @ValidateNested()
     @Type(() => RentDto)
-    rent: RentDto;
+    rent?: RentDto;
   
+    @IsOptional()
     @ValidateNested()
     @Type(() => AddressDto)
-    @IsOptional()
     address?: AddressDto;
   
     @IsOptional()
@@ -102,27 +106,33 @@ import {
     @IsNumber()
     views?: number;
   
+    @IsOptional()
     @IsArray()
     @IsString({ each: true })
-    images: string[];
+    images?: string[];
   
+    @IsOptional()
     @ValidateNested()
     @Type(() => LocationDto)
-    location: LocationDto;
+    location?: LocationDto;
   
+    @IsOptional()
     @IsMongoId()
-    user: string; // string representation of ObjectId
+    user?: string;
   
+    @IsOptional()
     @IsNumber()
-    maxGuests: number;
+    maxGuests?: number;
   
+    @IsOptional()
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => AvailabilityDto)
-    availability: AvailabilityDto[];
+    availability?: AvailabilityDto[];
   
+    @IsOptional()
     @IsArray()
     @IsString({ each: true })
-    amenities: string[];
+    amenities?: string[];
   }
   

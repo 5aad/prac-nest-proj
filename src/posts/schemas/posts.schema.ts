@@ -22,7 +22,7 @@ export interface IPost extends Document {
   views?: number;
   images: string[];
   location: { type: 'Point'; coordinates: [number, number] };
-  host: ObjectId; // ObjectId of the user
+  user: ObjectId; // ObjectId of the user
   maxGuests: number;
   availability: { start: Date; end: Date }[];
   amenities: string[];
@@ -53,7 +53,7 @@ const PostSchema = new Schema<IPost>(
       type: { type: String, enum: ['Point'], default: 'Point' },
       coordinates: [Number],
     },
-    host: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     maxGuests: { type: Number, required: true },
     availability: [{ start: Date, end: Date }],
     amenities: { type: [String], default: [] },
