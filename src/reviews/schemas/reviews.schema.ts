@@ -1,21 +1,28 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Schema, model, Document } from 'mongoose';
 import { ObjectId } from 'mongodb';
 
-@Schema({ timestamps: true })
-export class Reviews {
-  @Prop({ type: ObjectId, required: true })
+export interface IReview extends Document {
   receivingUser: ObjectId;
-
-  @Prop({ type: ObjectId, required: true })
   givenUser: ObjectId;
-
-  @Prop({ type: Number, required: true, min: 1, max: 5 })
   rating: number;
-
-  @Prop({ type: String, required: false })
   comment?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export type ReviewsDocument = Reviews & Document;
-export const ReviewsSchema = SchemaFactory.createForClass(Reviews);
+const ReviewSchema = new Schema<IReview>(
+  {
+    receivingUser: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    givenUser: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    rating: { type: Number, required: true, min: 1, max: 5 },
+    comment: { type: String, required: false },
+  },
+  {
+    timestamps: true,
+  },
+);
+
+const ReviewModel = model<IReview>('Review', ReviewSchema);
+
+// Export the model
+export { ReviewModel, ReviewSchema };

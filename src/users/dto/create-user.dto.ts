@@ -71,7 +71,7 @@ import {
     @Type(() => AddressDto)
     address?: AddressDto;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsBoolean()
     isEmailVerified: boolean;
   }

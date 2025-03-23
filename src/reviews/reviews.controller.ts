@@ -17,7 +17,9 @@ import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+// import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+// @ApiTags('reviews')
 @Controller('reviews')
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
@@ -25,6 +27,8 @@ export class ReviewsController {
   @UseGuards(JwtAuthGuard)
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+  // @ApiOperation({ summary: 'Create a new review' })
+  // @ApiResponse({ status: 201, description: 'Review created successfully' })
   async createReview(@Request() req, @Body() createReviewDto: CreateReviewDto) {
     try {
       createReviewDto.givenUser = req.user.id;

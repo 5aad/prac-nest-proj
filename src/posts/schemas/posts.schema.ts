@@ -64,4 +64,8 @@ const PostSchema = new Schema<IPost>(
 // Create 2dsphere index on the location field
 PostSchema.index({ location: '2dsphere' });
 
-export const PostModel = model<IPost>('Post', PostSchema);
+const PostModel = model<IPost>('Post', PostSchema);
+
+// Export the model
+export { PostModel, PostSchema };
+

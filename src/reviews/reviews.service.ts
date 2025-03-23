@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Reviews, ReviewsDocument } from './schemas/reviews.schema';
+import { IReview } from './schemas/reviews.schema';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { ObjectId } from 'mongodb';
@@ -13,11 +13,11 @@ import { ObjectId } from 'mongodb';
 @Injectable()
 export class ReviewsService {
   constructor(
-    @InjectModel(Reviews.name)
-    private readonly reviewsModel: Model<ReviewsDocument>,
+    @InjectModel('Review')
+    private readonly reviewsModel: Model<IReview>,
   ) {}
 
-  async createReview(createReviewDto: CreateReviewDto): Promise<Reviews> {
+  async createReview(createReviewDto: CreateReviewDto): Promise<IReview> {
     const { receivingUser, givenUser, rating, comment } = createReviewDto;
 
     if (rating < 1 || rating > 5) {
@@ -34,17 +34,17 @@ export class ReviewsService {
     return newReview.save();
   }
 
-  async getReviewsForUser(userId: string): Promise<Reviews[]> {
+  async getReviewsForUser(userId: string): Promise<IReview[]> {
     return this.reviewsModel
       .find({ receivingUser: new ObjectId(userId) })
       .exec();
   }
 
-  async getReviewsByGivenUser(userId: string): Promise<Reviews[]> {
+  async getReviewsByGivenUser(userId: string): Promise<IReview[]> {
     return this.reviewsModel.find({ givenUser: new ObjectId(userId) }).exec();
   }
 
-  async getReviewById(id: string): Promise<Reviews> {
+  async getReviewById(id: string): Promise<IReview> {
     const review = await this.reviewsModel.findById(id).exec();
 
     if (!review) {
@@ -57,7 +57,7 @@ export class ReviewsService {
   async updateReview(
     id: string,
     updateReviewDto: UpdateReviewDto,
-  ): Promise<Reviews> {
+  ): Promise<IReview> {
     const updatedReview = await this.reviewsModel
       .findByIdAndUpdate(id, updateReviewDto, { new: true })
       .exec();

@@ -6,9 +6,15 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserModel } from '../users/schemas/user.schema';
+import { UserSchema } from '../users/schemas/user.schema';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { GoogleStrategy } from './google.strategy';
+import { UsersModule } from 'src/users/users.module';
+
+const googleStrategyProvider =
+  process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+    ? [GoogleStrategy]
+    : [];
 
 @Module({
   imports: [
@@ -17,9 +23,10 @@ import { GoogleStrategy } from './google.strategy';
       secret: process.env.JWT_SECRET || 'test',
       signOptions: { expiresIn: '1h' }, // token expiration
     }),
-    MongooseModule.forFeature([{ name: 'User', schema: UserModel }]),
+    UsersModule,
+    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
   ],
-  providers: [AuthService, JwtStrategy, RolesGuard, GoogleStrategy],
+  providers: [AuthService, JwtStrategy, RolesGuard, ...googleStrategyProvider],
   controllers: [AuthController],
 })
 export class AuthModule {}
